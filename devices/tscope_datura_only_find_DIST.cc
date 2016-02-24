@@ -44,49 +44,52 @@ int main(int argc, char* argv[]) {
   //   DIST      DUT_DIST DUT_DIST
   
   // Distance between telescope planes in mm:
-  double DIST = 20;
+  // double DIST = 20;
   // Distance of telescope arms and DUT assembly:
-  double DUT_DIST = 20;
+  double DUT_DIST = 1000;
 
   // Beam energy 5 GeV electrons/positrons at DESY:
-  double BEAM = 2.0;
+  double BEAM = 5.0;
 
 
 
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
 
-  // Build a vector of all telescope planes:
-  std::vector<plane> datura;
-  double position = 0;
-  
-  // Upstream telescope arm:
-  for(int i = 0; i < 3; i++) {
-    datura.push_back(plane(position,MIM26,true,RES));
-    position += DIST;
-  }
 
-  // Downstream telescope arm:
-  position = 2*DIST + 2*DUT_DIST;
-  for(int i = 0; i < 3; i++) {
-    datura.push_back(plane(position,MIM26,true,RES));
-    position += DIST;
-  }
+  for(int DIST = 20; DIST <= 150 ; DIST += 10) {
 
-  for(double dut_x0 = 0.000; dut_x0 < 0.02; dut_x0 += 0.002) {
+    // Build a vector of all telescope planes:
+    std::vector<plane> datura;
+    double position = 0;
+    
+    // Upstream telescope arm:
+    for(int i = 0; i < 3; i++) {
+      datura.push_back(plane(position,MIM26,true,RES));
+      position += DIST;
+    }
+
+    // Downstream telescope arm:
+    position = 2*DIST + 2*DUT_DIST;
+    for(int i = 0; i < 3; i++) {
+      datura.push_back(plane(position,MIM26,true,RES));
+      position += DIST;
+    }
+
 
     // Prepare the DUT (no measurement, just scatterer
-    plane dut(2*DIST+DUT_DIST, dut_x0, false);
+    //plane dut(2*DIST+DUT_DIST, dut_x0, false);
 
     // Duplicate the planes vector and add the current DUT:
-    std::vector<plane> planes = datura;
-    planes.push_back(dut);
+    //std::vector<plane> planes = datura;
+    //planes.push_back(dut);
 
     // Build the telescope:
-    telescope mytel(planes, BEAM);
+    //telescope mytel(planes, BEAM);
+    telescope mytel(datura, BEAM);
 
     // Get the resolution at plane-vector position (x):
-    LOG(logRESULT) << "Track resolution at DUT with " << dut_x0 << "% X0: " << mytel.getResolution(3);
+    LOG(logRESULT) << "The pointing resolution for a plane distance of " << DIST << " mm is " << mytel.getResolution(3) << " mum";
   }
   
   return 0;
